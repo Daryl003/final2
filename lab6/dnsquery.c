@@ -418,3 +418,82 @@ void ChangetoDnsNameFormat(unsigned char* dns,unsigned char* host)
 	*dns++='\0';
 }
 
+int httpClient() 
+{
+
+        int     sSocket;
+        struct sockaddr_in stSvrAddrIn; /* 服务器端地址 */
+	struct sockaddr_in clientAddr;/*client addr*/
+        char        sndBuf[1024] = {0};
+        char        rcvBuf[2048] = {0};
+        char       *pRcv         = rcvBuf;
+        int         num          = 0;
+        int         nRet         ;
+	char	*dst_ip;
+	int	ip_lenth;
+	
+	ip_lenth = strlen(dns_result);
+	dst_ip = (char *)malloc(ip_lenth*sizeof(char));
+	dst_ip = dns_result;
+        /* HTTP 消息构造开始,这是程序的关键之处 */
+/*
+        sprintf(sndBuf, "GET / HTTP/1.1\n");
+        strcat(sndBuf, "Host: www.163.com\r\n");
+	strcat(sndBuf, "User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3\r\n");
+	strcat(sndBuf, "Accept-Language: en, mi\r\n");
+*/
+	sprintf(sndBuf,"GET / HTTP/1.1\r\n");
+	strcat(sndBuf,"Accept:html/text*/*\r\n");
+	strcat(sndBuf,"Accept-language:zh-ch\r\n");
+	strcat(sndBuf,"Accept-Encoding:gzip,deflate\r\n");
+
+//	strcat(sndBuf,"Host: 180.97.33.107:80\r\n");
+//	strcat(sndBuf,"Host: 13.250.177.223\r\n");
+	strcat(sndBuf,"Host: ");
+	strcat(sndBuf,dst_ip);
+	strcat(sndBuf,"\r\n");
+	strcat(sndBuf,"User-Agent:client<1.0>\r\n");
+	strcat(sndBuf,"Connection:Close\r\n");
+	strcat(sndBuf,"\r\n");
+	printf("sndBuf = %s\n",sndBuf);
+
+        /* HTTP 消息构造结束 */
+        /* socket DLL初始化 */
+     
+     stSvrAddrIn.sin_family      = AF_INET;
+     stSvrAddrIn.sin_port        = htons(80);
+     stSvrAddrIn.sin_addr.s_addr = inet_addr(dst_ip);//www.baidu.com 180.97.33.107
+
+     clientAddr.sin_family = AF_INET;
+     clientAddr.sin_port = htons(8080);
+     clientAddr.sin_addr.s_addr = inet_addr("192.168.40.18");//192.168.40.254 MenuOS
+
+
+     sSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+     bind(sSocket, (struct sockaddr *)&clientAddr, sizeof(clientAddr));
+          /* 连接 */
+     nRet = connect(sSocket, (struct sockaddr *)&stSvrAddrIn, sizeof(stSvrAddrIn));
+        if (nRet<0)
+        {
+               printf("connect fail!/n");
+               return -1;
+        }
+               /* 发送HTTP请求消息 */
+
+        send(sSocket, (char*)sndBuf, sizeof(sndBuf), 0);
+          /* 接收HTTP响应消息 */
+        while(1)
+        {
+               num = recv(sSocket, pRcv, 2048, 0);
+                 pRcv += num;
+              if((0 == num) || (-1 == num))
+               {
+                      break ;
+               }
+	
+        }
+               /* 打印响应消息 */
+        printf("%s/n", rcvBuf);
+          return 0; 
+} 
