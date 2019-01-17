@@ -475,11 +475,11 @@ int httpClient()
      
      stSvrAddrIn.sin_family      = AF_INET;
      stSvrAddrIn.sin_port        = htons(80);
-     stSvrAddrIn.sin_addr.s_addr = inet_addr(dst_ip);//www.baidu.com 180.97.33.107
+     stSvrAddrIn.sin_addr.s_addr = inet_addr(dst_ip);
 
      clientAddr.sin_family = AF_INET;
      clientAddr.sin_port = htons(8080);
-     clientAddr.sin_addr.s_addr = inet_addr("192.168.40.18");//192.168.40.254 MenuOS
+     clientAddr.sin_addr.s_addr = inet_addr("192.168.40.254");
 
 
      sSocket = socket(AF_INET, SOCK_STREAM, 0);
